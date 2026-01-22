@@ -17,7 +17,6 @@ export default function Galeria() {
 
     const [imagenes, setImagenes] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
 
 
   useEffect(() => {
@@ -30,8 +29,13 @@ export default function Galeria() {
 
         const data = await res.json()
         setImagenes(data)
-      } catch (err) {
-        setError(err.message)
+      } catch (
+        error
+      ) {
+        console.error(error)
+
+        throw new Error("Error al cargar imágenes");
+        
       } finally {
         setLoading(false)
       }
@@ -48,13 +52,7 @@ export default function Galeria() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="text-red-500 text-center">
-        {error}
-      </div>
-    )
-  }
+
   return (
      <section className="p-6">
       <h1 className="text-3xl dark:text-white font-bold mb-6 text-center">
