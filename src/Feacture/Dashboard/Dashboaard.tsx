@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 export default function Dashboaard() {
   return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+    <>
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-indigo-600/20 blur-3xl" />
         <div className="absolute top-40 -right-24 h-72 w-72 rounded-full bg-fuchsia-600/20 blur-3xl" />
@@ -37,6 +37,7 @@ export default function Dashboaard() {
           © {new Date().getFullYear()} — Proyecto Portafolio UEEES - Cristhian Quispe
         </div>
       </section>
-    </main>
+    </>
+  
   );
 }

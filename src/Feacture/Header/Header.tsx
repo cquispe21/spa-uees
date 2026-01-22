@@ -54,6 +54,10 @@ export const Header: FC<HeaderProps> = ({
             </svg>
           )}
         </button>
+
+      <div>
+        <p className="text-white">PORTAFOLIO CRISTHIAN QUISPE</p>
+      </div>
       </div>
 
       <div className="my-auto lg:hidden  flex items-center py-2 space-x-2  ">

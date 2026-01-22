@@ -63,7 +63,6 @@ function Contentnav({ isHovered, OpenMenu, OpenMenuMobile }: ContentnavProps) {
                   />
                 </svg>
 
-                
                 {(isHovered && !OpenMenu) || OpenMenu || OpenMenuMobile ? (
                   <p className=" dark:group-hover:text-black group-hover:text-black">
                     Inicio
@@ -79,18 +78,15 @@ function Contentnav({ isHovered, OpenMenu, OpenMenuMobile }: ContentnavProps) {
                 className={` group flex hover:bg-gray-200 hover:text-gray-900  text-gray-300 items-center rounded-md  px-2 py-2 text-sm font-medium  peer-checked:bg-slate-900 
                        `}
               >
-               <svg
-                                  className="mr-3 h-6 w-6 flex-shrink-0  my-auto dark:group-hover:text-black group-hover:text-black"
-
+                <svg
+                  className="mr-3 h-6 w-6 flex-shrink-0  my-auto dark:group-hover:text-black group-hover:text-black"
                   xmlns="http://www.w3.org/2000/svg"
-                 
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                 
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
@@ -99,6 +95,66 @@ function Contentnav({ isHovered, OpenMenu, OpenMenuMobile }: ContentnavProps) {
                 {(isHovered && !OpenMenu) || OpenMenu || OpenMenuMobile ? (
                   <p className=" dark:group-hover:text-black group-hover:text-black">
                     Galeria
+                  </p>
+                ) : (
+                  <></>
+                )}
+              </li>
+            </Link>
+
+            <Link to="/nosotros">
+              <li
+                className={` group flex hover:bg-gray-200 hover:text-gray-900  text-gray-300 items-center rounded-md  px-2 py-2 text-sm font-medium  peer-checked:bg-slate-900 
+                       `}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="mr-3 h-6 w-6 flex-shrink-0  my-auto dark:group-hover:text-black group-hover:text-black"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" />
+                  <path d="M15 7a2 2 0 0 1 2 2" />
+                  <path d="M15 3a6 6 0 0 1 6 6" />
+                </svg>
+
+
+                {(isHovered && !OpenMenu) || OpenMenu || OpenMenuMobile ? (
+                  <p className=" dark:group-hover:text-black group-hover:text-black">
+                    Nosotros
+                  </p>
+                ) : (
+                  <></>
+                )}
+              </li>
+            </Link>
+
+            <Link to="/contacto">
+              <li
+                className={` group flex hover:bg-gray-200 hover:text-gray-900  text-gray-300 items-center rounded-md  px-2 py-2 text-sm font-medium  peer-checked:bg-slate-900 
+                       `}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                                   className="mr-3 h-6 w-6 flex-shrink-0  my-auto dark:group-hover:text-black group-hover:text-black"
+
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M12 2a5 5 0 1 1 -5 5l.005 -.217a5 5 0 0 1 4.995 -4.783z" />
+                  <path d="M14 14a5 5 0 0 1 5 5v1a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-1a5 5 0 0 1 5 -5h4z" />
+                </svg>
+
+             
+                {(isHovered && !OpenMenu) || OpenMenu || OpenMenuMobile ? (
+                  <p className=" dark:group-hover:text-black group-hover:text-black">
+                    Contacto
                   </p>
                 ) : (
                   <></>

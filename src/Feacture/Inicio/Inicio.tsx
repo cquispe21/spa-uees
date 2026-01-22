@@ -3,6 +3,7 @@ import SidebarDesktop from "../Sidebar/Desktop/Index";
 import SidebarMobile from "../Sidebar/Mobile";
 import { Header } from "../Header/Header";
 import { useState, type FC } from "react";
+import Footer from "../Footer/Footer";
 
 
 
@@ -30,10 +31,12 @@ export const Inicio: FC = () => {
           OpenMenuMobile={OpenMenuMobile}
           setOpenMenuMobile={setOpenMenuMobile}
         />
-        <main className="h-screen  bg-white  mx-5 my-4 dark:bg-gray-900">
+         <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
           
           <Outlet />
         </main>
+
+        <Footer />
       </div>
     </div>
   );
