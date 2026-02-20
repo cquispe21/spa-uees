@@ -134,6 +134,52 @@ function Contentnav({ isHovered, OpenMenu, OpenMenuMobile }: ContentnavProps) {
               </li>
             </Link>
 
+
+
+
+                    <Link to="/actividad1">
+              <li
+                className={` group flex hover:bg-gray-200 hover:text-gray-900  text-gray-300 items-center rounded-md  px-2 py-2 text-sm font-medium  peer-checked:bg-slate-900 
+                       `}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="mr-3 h-6 w-6 flex-shrink-0  my-auto dark:group-hover:text-black group-hover:text-black"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" />
+                  <path d="M15 7a2 2 0 0 1 2 2" />
+                  <path d="M15 3a6 6 0 0 1 6 6" />
+                </svg>
+
+
+                {(isHovered && !OpenMenu) || OpenMenu || OpenMenuMobile ? (
+                  <p className=" dark:group-hover:text-black group-hover:text-black">
+                    Actividad 1 - 2P
+                  </p>
+                ) : (
+                  <></>
+                )}
+              </li>
+            </Link>
+
+
+
+
+
+
+
+
+
+
+
+
             <Link to="/contacto">
               <li
                 className={` group flex hover:bg-gray-200 hover:text-gray-900  text-gray-300 items-center rounded-md  px-2 py-2 text-sm font-medium  peer-checked:bg-slate-900 

@@ -7,6 +7,7 @@ import Galeria from "./Feacture/Galeria/Galeria";
 import Dashboaard from "./Feacture/Dashboard/Dashboaard";
 import Nosotros from "./Feacture/Nosotros/Nosotros";
 import Contacto from "./Feacture/Contacto/Nosotros";
+import Actividad1Index from "./Feacture/Actividad1-2P/Actividad1Index";
 function App() {
 
   return (
@@ -18,6 +19,8 @@ function App() {
        <Route path="/galeria" element={<Galeria />} />
        <Route path="/nosotros" element={<Nosotros />} />
        <Route path="/contacto" element={<Contacto />} />
+       <Route path="/actividad1" element={<Actividad1Index />} />
+       
       </Route>
     </Routes>
   );
