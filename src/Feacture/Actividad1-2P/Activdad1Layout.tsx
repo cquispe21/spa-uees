@@ -26,33 +26,14 @@ export default function Activdad1Layout() {
     setResult,
     containerRef,
     setIsOpen,
+    fetchPokemonByNameOrId
   } = useContext(Actividad1Context) as IActividad1Context;
 
   const { register, handleSubmit, reset, setValue } = useForm<FormValues>({
     defaultValues: { query: "" },
   });
 
-  async function fetchPokemonByNameOrId(
-    nameOrId: string,
-  ): Promise<PokemonViewModel> {
-    const key = nameOrId.trim().toLowerCase();
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
-    if (!res.ok)
-      throw new Error("No encontrado. Prueba con otro nombre o número.");
 
-    const data = (await res.json()) as PokemonApiResponse;
-    const official =
-      data.sprites.other?.["official-artwork"]?.front_default ?? null;
-
-    return {
-      id: data.id,
-      name: data.name,
-      height: data.height,
-      weight: data.weight,
-      imageUrl: official ?? data.sprites.front_default ?? null,
-      types: data.types.map((t) => t.type.name),
-    };
-  }
 
   const onSubmit = async (values: FormValues) => {
     setError("");
