@@ -1,5 +1,12 @@
-import React, { createContext, useEffect, useRef, useState, type ReactNode } from "react";
-import type { PokemonApiResponse, PokemonListItem, PokemonResponse, PokemonViewModel } from "../../domain/actividad";
+import React, {
+  createContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import type { PokemonListItem, PokemonViewModel } from "../../domain/actividad";
+import PokemonService from "../../services/PokemonService";
 
 export interface IActividad1Context {
   loading: boolean;
@@ -18,6 +25,7 @@ export interface IActividad1Context {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   containerRef: React.RefObject<HTMLDivElement | null>;
   fetchPokemonByNameOrId: (nameOrId: string) => Promise<PokemonViewModel>;
+  SearchPokemonName: (name: string) => Promise<void>;
 }
 
 const Actividad1Context = createContext({});
@@ -33,51 +41,40 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-
-  const APIURL = import.meta.env.VITE_API_URL
-
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  async function loadList(
-
-  ) {
+  async function PokemonListAsync() {
     try {
       setListReady(false);
-      const res = await fetch(
-        APIURL,
-      );
-      const data: PokemonResponse = await res.json();
-      setAllPokemon(data.results);
-
+      const res = await loadList();
+      setAllPokemon(res);
+      setListReady(true);
     } catch (e) {
-
       setError(e instanceof Error ? e.message : "Error cargando lista.");
       setListReady(false);
-
     }
   }
 
-    async function fetchPokemonByNameOrId(
-      nameOrId: string,
-    ): Promise<PokemonViewModel> {
-      const key = nameOrId.trim().toLowerCase();
-      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
-      if (!res.ok)
-        throw new Error("No encontrado. Prueba con otro nombre o número.");
-  
-      const data = (await res.json()) as PokemonApiResponse;
-      const official =
-        data.sprites.other?.["official-artwork"]?.front_default ?? null;
-  
-      return {
-        id: data.id,
-        name: data.name,
-        height: data.height,
-        weight: data.weight,
-        imageUrl: official ?? data.sprites.front_default ?? null,
-        types: data.types.map((t) => t.type.name),
-      };
+
+
+ async function SearchPokemonName(name: string) {
+    setIsOpen(false);
+    setError("");
+    setResult(null);
+
+    setLoading(true);
+    setStatusText(`Buscando información de "${name}"...`);
+
+    try {
+      const pokemon = await fetchPokemonByNameOrId(name);
+      setResult(pokemon);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido.");
+    } finally {
+      setLoading(false);
+      setStatusText("");
     }
+  }
 
 
 
@@ -85,20 +82,14 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
 
 
 
-
-
-
-
-
-
-
-
+  const { fetchPokemonByNameOrId, loadList } = PokemonService();
 
   useEffect(() => {
-    loadList();
+    PokemonListAsync();
   }, []);
   const storage: IActividad1Context = {
     loading,
+    SearchPokemonName,
     fetchPokemonByNameOrId,
     statusText,
     error,
@@ -113,7 +104,7 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
     setStatusText,
     setError,
     setResult,
-    containerRef
+    containerRef,
   };
 
   return (

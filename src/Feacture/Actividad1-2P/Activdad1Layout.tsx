@@ -1,12 +1,11 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect,  useState } from "react";
 import Actividad1Context, { type IActividad1Context } from "./Activdad1Context";
 import { useForm } from "react-hook-form";
 import Select from "react-select";
 
 import type {
   FormValues,
-  PokemonApiResponse,
-  PokemonViewModel,
+
 } from "../../domain/actividad";
 import ResultSearchApi from "./Components/ResultSearchApi";
 function toTitleCase(s: string) {
@@ -19,21 +18,18 @@ export default function Activdad1Layout() {
     error,
     result,
     allPokemon,
-    listReady,
     setLoading,
     setStatusText,
     setError,
     setResult,
-    containerRef,
     setIsOpen,
-    fetchPokemonByNameOrId
+    fetchPokemonByNameOrId,
+    SearchPokemonName,
   } = useContext(Actividad1Context) as IActividad1Context;
 
-  const { register, handleSubmit, reset, setValue } = useForm<FormValues>({
+  const { handleSubmit, reset} = useForm<FormValues>({
     defaultValues: { query: "" },
   });
-
-
 
   const onSubmit = async (values: FormValues) => {
     setError("");
@@ -67,31 +63,10 @@ export default function Activdad1Layout() {
     setStatusText("");
     setLoading(false);
     setIsOpen(false);
+    setSelectedPokemon(null);
   }
 
-  async function pickSuggestion(name: string) {
-    setIsOpen(false);
-    setValue("query", name, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: false,
-    });
-    setError("");
-    setResult(null);
 
-    setLoading(true);
-    setStatusText(`Buscando información de "${name}"...`);
-
-    try {
-      const pokemon = await fetchPokemonByNameOrId(name);
-      setResult(pokemon);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido.");
-    } finally {
-      setLoading(false);
-      setStatusText("");
-    }
-  }
 
   const showMainUi = !loading;
 
@@ -150,15 +125,16 @@ export default function Activdad1Layout() {
             onSubmit={handleSubmit(onSubmit)}
             className="mt-6 flex items-start gap-3"
           >
-            <div ref={containerRef} className="relative flex-1">
+            <div className="relative flex-1">
               <Select
                 options={options}
                 value={selectedPokemon}
                 inputValue={search}
+                placeholder="Escribe el nombre o número de un Pokémon..."
                 onInputChange={(value) => setSearch(value)}
                 onChange={(option) => {
                   setSelectedPokemon(option);
-                  if (option) pickSuggestion(option.value);
+                  if (option) SearchPokemonName(option.value);
                 }}
                 styles={{
                   control: (baseStyles, state) => ({
@@ -220,13 +196,6 @@ export default function Activdad1Layout() {
               Limpiar
             </button>
           </form>
-
-          {!listReady && (
-            <div className="mt-3 text-sm text-gray-600">
-              Tip: mientras carga la lista, igual puedes buscar exacto por
-              nombre/id (ej: <span className="font-semibold">pikachu</span>).
-            </div>
-          )}
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
