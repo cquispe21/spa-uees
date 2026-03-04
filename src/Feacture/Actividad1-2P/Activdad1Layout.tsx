@@ -130,7 +130,7 @@ export default function Activdad1Layout() {
                 options={options}
                 value={selectedPokemon}
                 inputValue={search}
-                placeholder="Escribe el nombre o número de un Pokémon..."
+                placeholder="Escribe el nombre  de un Pokémon..."
                 onInputChange={(value) => setSearch(value)}
                 onChange={(option) => {
                   setSelectedPokemon(option);
