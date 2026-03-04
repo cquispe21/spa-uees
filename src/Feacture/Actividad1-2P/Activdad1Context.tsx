@@ -1,9 +1,7 @@
-import React, { createContext, useState, type ReactNode } from "react";
+import React, { createContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { PokemonListItem, PokemonViewModel } from "../../domain/actividad";
 
 export interface IActividad1Context {
-
-
   loading: boolean;
   statusText: string;
   error: string;
@@ -18,17 +16,12 @@ export interface IActividad1Context {
   setAllPokemon: React.Dispatch<React.SetStateAction<PokemonListItem[]>>;
   setListReady: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const Actividad1Context = createContext({});
 
 export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
-
-  
-  
-  
-
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState("");
   const [error, setError] = useState("");
@@ -38,36 +31,83 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
   const [listReady, setListReady] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+
+
+
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+
+  useEffect(() => {
+      let cancelled = false;
   
-
-
-
-
-
-
+      async function loadList() {
+        try {
+          setListReady(false);
+          const res = await fetch(
+            "https://pokeapi.co/api/v2/pokemon?limit=2000&offset=0",
+          );
+          if (!res.ok) throw new Error("No se pudo cargar la lista de Pokémon.");
+          const data = (await res.json()) as { results: PokemonListItem[] };
   
+          if (!cancelled) {
+            setAllPokemon(data.results ?? []);
+            setListReady(true);
+          }
+        } catch (e) {
+          if (!cancelled) {
+            setError(e instanceof Error ? e.message : "Error cargando lista.");
+            setListReady(false);
+          }
+        }
+      }
+  
+      loadList();
+      return () => {
+        cancelled = true;
+      };
+    }, []);
+
+
+ useEffect(() => {
+    function onDocMouseDown(e: MouseEvent) {
+      const target = e.target as Node;
+      if (containerRef.current && !containerRef.current.contains(target)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, []);
+
+
+
+
+
+
   const storage: IActividad1Context = {
-   
-
-  loading,
-  statusText,
-  error,
-  result,
-  allPokemon,
-  listReady,
-  isOpen,
-setAllPokemon,
-setListReady,
-setIsOpen,
-setLoading,
-setStatusText,
-setError,
-setResult,
-
+    loading,
+    statusText,
+    error,
+    result,
+    allPokemon,
+    listReady,
+    isOpen,
+    setAllPokemon,
+    setListReady,
+    setIsOpen,
+    setLoading,
+    setStatusText,
+    setError,
+    setResult,
+    containerRef
   };
 
   return (
-    <Actividad1Context.Provider value={storage}>{children}</Actividad1Context.Provider>
+    <Actividad1Context.Provider value={storage}>
+      {children}
+    </Actividad1Context.Provider>
   );
 };
 

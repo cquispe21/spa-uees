@@ -1,7 +1,13 @@
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import Actividad1Context, { type IActividad1Context } from "./Activdad1Context";
 import { useForm } from "react-hook-form";
-import type { FormValues, PokemonApiResponse, PokemonListItem, PokemonViewModel } from "../../domain/actividad";
+import Select from "react-select";
+
+import type {
+  FormValues,
+  PokemonApiResponse,
+  PokemonViewModel,
+} from "../../domain/actividad";
 import ResultSearchApi from "./Components/ResultSearchApi";
 function toTitleCase(s: string) {
   return s ? s[0].toUpperCase() + s.slice(1).toLowerCase() : s;
@@ -14,83 +20,17 @@ export default function Activdad1Layout() {
     result,
     allPokemon,
     listReady,
-    isOpen,
     setLoading,
     setStatusText,
     setError,
     setResult,
-    setAllPokemon,
-    setListReady,
+    containerRef,
     setIsOpen,
   } = useContext(Actividad1Context) as IActividad1Context;
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const { register, handleSubmit, watch, reset, setValue } =
-    useForm<FormValues>({
-      defaultValues: { query: "" },
-    });
-
-  const query = watch("query") ?? "";
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadList() {
-      try {
-        setListReady(false);
-        const res = await fetch(
-          "https://pokeapi.co/api/v2/pokemon?limit=2000&offset=0",
-        );
-        if (!res.ok) throw new Error("No se pudo cargar la lista de Pokémon.");
-        const data = (await res.json()) as { results: PokemonListItem[] };
-
-        if (!cancelled) {
-          setAllPokemon(data.results ?? []);
-          setListReady(true);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Error cargando lista.");
-          setListReady(false);
-        }
-      }
-    }
-
-    loadList();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    function onDocMouseDown(e: MouseEvent) {
-      const target = e.target as Node;
-      if (containerRef.current && !containerRef.current.contains(target)) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", onDocMouseDown);
-    return () => document.removeEventListener("mousedown", onDocMouseDown);
-  }, []);
-
-  const trimmed = useMemo(() => query.trim(), [query]);
-  const normalized = useMemo(() => trimmed.toLowerCase(), [trimmed]);
-
-  const suggestions = useMemo(() => {
-    if (!normalized || !listReady) return [];
-    const matches = allPokemon.filter((p) => p.name.includes(normalized));
-    return matches.slice(0, 8);
-  }, [normalized, listReady, allPokemon]);
-
-  useEffect(() => {
-    if (!normalized || suggestions.length === 0) {
-      setIsOpen(false);
-      return;
-    }
-    setIsOpen(true);
-  }, [normalized, suggestions.length]);
+  const { register, handleSubmit, reset, setValue } = useForm<FormValues>({
+    defaultValues: { query: "" },
+  });
 
   async function fetchPokemonByNameOrId(
     nameOrId: string,
@@ -174,6 +114,37 @@ export default function Activdad1Layout() {
 
   const showMainUi = !loading;
 
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const darkModeMediaQuery = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    );
+    setIsDarkMode(darkModeMediaQuery.matches);
+
+    const handleChange = (e: any) => {
+      setIsDarkMode(e.matches);
+    };
+
+    darkModeMediaQuery.addEventListener("change", handleChange);
+    return () => darkModeMediaQuery.removeEventListener("change", handleChange);
+  }, []);
+  const [search, setSearch] = useState("");
+
+  const [selectedPokemon, setSelectedPokemon] = useState(
+    null as { value: string; label: string } | null,
+  );
+
+  const normalized = search.trim().toLowerCase();
+
+  const options = allPokemon
+    .filter((p) => p.name.toLowerCase().includes(normalized))
+    .slice(0, 8)
+    .map((p) => ({
+      value: p.name,
+      label: toTitleCase(p.name),
+    }));
+
   return (
     <div className="mx-auto max-w-3xl p-4 font-sans">
       <h1 className="text-3xl font-semibold">Actividad 1 - 2P</h1>
@@ -199,47 +170,66 @@ export default function Activdad1Layout() {
             className="mt-6 flex items-start gap-3"
           >
             <div ref={containerRef} className="relative flex-1">
-              <input
-                type="text"
-                placeholder={
-                  listReady
-                    ? "Ej: pikachu o 25"
-                    : "Cargando lista... (puedes buscar igual)"
-                }
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base outline-none focus:border-gray-900"
-                {...register("query", {
-                  onChange: () => setIsOpen(true),
-                })}
-                onFocus={() => {
-                  if (normalized && suggestions.length > 0) setIsOpen(true);
+              <Select
+                options={options}
+                value={selectedPokemon}
+                inputValue={search}
+                onInputChange={(value) => setSearch(value)}
+                onChange={(option) => {
+                  setSelectedPokemon(option);
+                  if (option) pickSuggestion(option.value);
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") setIsOpen(false);
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: isDarkMode
+                      ? state.isFocused
+                        ? "#374151"
+                        : "#1f2937"
+                      : state.isFocused
+                        ? "#f0f0f0"
+                        : "#fff",
+                    borderColor: isDarkMode
+                      ? state.isFocused
+                        ? "#6b7280"
+                        : "#4b5563"
+                      : state.isFocused
+                        ? "#ccc"
+                        : "#ddd",
+                    color: isDarkMode ? "white" : "black",
+                    textTransform: "uppercase",
+                  }),
+                  menu: (baseStyles) => ({
+                    ...baseStyles,
+                    backgroundColor: isDarkMode ? "#1f2937" : "#fff",
+                    color: isDarkMode ? "white" : "black",
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: isDarkMode
+                      ? state.isSelected
+                        ? "#4b5563"
+                        : state.isFocused
+                          ? "#6b7280"
+                          : "#1f2937"
+                      : state.isSelected
+                        ? "#e0e0e0"
+                        : state.isFocused
+                          ? "#f0f0f0"
+                          : "#fff",
+                    color: isDarkMode ? "white" : "black",
+                  }),
+                  singleValue: (baseStyles) => ({
+                    ...baseStyles,
+                    color: isDarkMode ? "white" : "black",
+                  }),
+                  input: (baseStyles) => ({
+                    ...baseStyles,
+                    color: isDarkMode ? "white" : "black", // Aquí agregamos el color del texto en el input
+                  }),
                 }}
               />
-
-              {listReady && isOpen && suggestions.length > 0 && (
-                <div className="absolute left-0 right-0 top-[calc(100%+0.375rem)] z-10 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                  {suggestions.map((s) => (
-                    <button
-                      key={s.name}
-                      type="button"
-                      onClick={() => pickSuggestion(s.name)}
-                      className="w-full dark:text-black px-4 py-2 text-left text-sm hover:bg-gray-50"
-                    >
-                      {toTitleCase(s.name)}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
-
-            <button
-              type="submit"
-              className="rounded-xl border border-gray-900 bg-gray-900 px-4 py-3 text-sm font-semibold text-white hover:bg-black"
-            >
-              Buscar
-            </button>
 
             <button
               type="button"
@@ -263,9 +253,7 @@ export default function Activdad1Layout() {
             </div>
           )}
 
-          {result && (
-           <ResultSearchApi/>
-          )}
+          {result && <ResultSearchApi />}
         </>
       )}
     </div>
