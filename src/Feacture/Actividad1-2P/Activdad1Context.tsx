@@ -23,7 +23,6 @@ export interface IActividad1Context {
   setAllPokemon: React.Dispatch<React.SetStateAction<PokemonListItem[]>>;
   setListReady: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  containerRef: React.RefObject<HTMLDivElement | null>;
   fetchPokemonByNameOrId: (nameOrId: string) => Promise<PokemonViewModel>;
   SearchPokemonName: (name: string) => Promise<void>;
 }
@@ -41,7 +40,10 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const { fetchPokemonByNameOrId, loadList } = PokemonService();
+
+
 
   async function PokemonListAsync() {
     try {
@@ -82,7 +84,6 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
 
 
 
-  const { fetchPokemonByNameOrId, loadList } = PokemonService();
 
   useEffect(() => {
     PokemonListAsync();
@@ -104,7 +105,6 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
     setStatusText,
     setError,
     setResult,
-    containerRef,
   };
 
   return (
