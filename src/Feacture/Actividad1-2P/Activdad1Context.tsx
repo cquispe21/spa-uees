@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useRef, useState, type ReactNode } from "react";
-import type { PokemonListItem, PokemonViewModel } from "../../domain/actividad";
+import type { PokemonApiResponse, PokemonListItem, PokemonResponse, PokemonViewModel } from "../../domain/actividad";
 
 export interface IActividad1Context {
   loading: boolean;
@@ -17,6 +17,7 @@ export interface IActividad1Context {
   setListReady: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   containerRef: React.RefObject<HTMLDivElement | null>;
+  fetchPokemonByNameOrId: (nameOrId: string) => Promise<PokemonViewModel>;
 }
 
 const Actividad1Context = createContext({});
@@ -33,61 +34,72 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
 
 
-
+  const APIURL = import.meta.env.VITE_API_URL
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  async function loadList(
 
-  useEffect(() => {
-      let cancelled = false;
+  ) {
+    try {
+      setListReady(false);
+      const res = await fetch(
+        APIURL,
+      );
+      const data: PokemonResponse = await res.json();
+      setAllPokemon(data.results);
+
+    } catch (e) {
+
+      setError(e instanceof Error ? e.message : "Error cargando lista.");
+      setListReady(false);
+
+    }
+  }
+
+    async function fetchPokemonByNameOrId(
+      nameOrId: string,
+    ): Promise<PokemonViewModel> {
+      const key = nameOrId.trim().toLowerCase();
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
+      if (!res.ok)
+        throw new Error("No encontrado. Prueba con otro nombre o número.");
   
-      async function loadList() {
-        try {
-          setListReady(false);
-          const res = await fetch(
-            "https://pokeapi.co/api/v2/pokemon?limit=2000&offset=0",
-          );
-          if (!res.ok) throw new Error("No se pudo cargar la lista de Pokémon.");
-          const data = (await res.json()) as { results: PokemonListItem[] };
+      const data = (await res.json()) as PokemonApiResponse;
+      const official =
+        data.sprites.other?.["official-artwork"]?.front_default ?? null;
   
-          if (!cancelled) {
-            setAllPokemon(data.results ?? []);
-            setListReady(true);
-          }
-        } catch (e) {
-          if (!cancelled) {
-            setError(e instanceof Error ? e.message : "Error cargando lista.");
-            setListReady(false);
-          }
-        }
-      }
-  
-      loadList();
-      return () => {
-        cancelled = true;
+      return {
+        id: data.id,
+        name: data.name,
+        height: data.height,
+        weight: data.weight,
+        imageUrl: official ?? data.sprites.front_default ?? null,
+        types: data.types.map((t) => t.type.name),
       };
-    }, []);
-
-
- useEffect(() => {
-    function onDocMouseDown(e: MouseEvent) {
-      const target = e.target as Node;
-      if (containerRef.current && !containerRef.current.contains(target)) {
-        setIsOpen(false);
-      }
     }
 
-    document.addEventListener("mousedown", onDocMouseDown);
-    return () => document.removeEventListener("mousedown", onDocMouseDown);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  useEffect(() => {
+    loadList();
   }, []);
-
-
-
-
-
-
   const storage: IActividad1Context = {
     loading,
+    fetchPokemonByNameOrId,
     statusText,
     error,
     result,
