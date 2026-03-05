@@ -105,8 +105,7 @@ export default function Activdad1Layout() {
     <div className="mx-auto max-w-3xl p-4 font-sans">
       <h1 className="text-3xl font-semibold">Actividad 1 - 2P</h1>
       <p className="text-2xl ">
-        Sistema de búsqueda de Pokémon API, con comportamiento async y
-        comportamientos UI
+        Sistema de búsqueda de Pokémon API
       </p>
 
       {loading && (

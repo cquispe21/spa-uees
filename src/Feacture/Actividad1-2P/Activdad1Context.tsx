@@ -78,15 +78,13 @@ export const Actividad1Provider = ({ children }: { children: ReactNode }) => {
   }
 
 
-
-
-
-
-
-
   useEffect(() => {
     PokemonListAsync();
   }, []);
+
+
+
+  
   const storage: IActividad1Context = {
     loading,
     SearchPokemonName,
